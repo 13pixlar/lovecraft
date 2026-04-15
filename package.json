@@ -9,6 +9,7 @@
     "dev:server": "tsx watch server/index.ts",
     "build": "tsc -b && vite build",
     "start": "NODE_ENV=production tsx server/index.ts",
+    "deploy": "npm run build && sudo systemctl restart lovecraft",
     "lint": "eslint .",
     "preview": "vite preview"
   },
