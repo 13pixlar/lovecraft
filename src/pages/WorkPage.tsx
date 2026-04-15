@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, BookmarkPlus, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -27,6 +28,10 @@ import { getOrCreateClientId } from '@/lib/clientId'
 import type { TrackRow } from '@/lib/types'
 import { formatTime } from '@/lib/format'
 import * as storage from '@/lib/storage'
+import { buildAudiobookJsonLd } from '@/lib/jsonLd'
+import { DEFAULT_META_DESCRIPTION, SITE_NAME } from '@/lib/siteConstants'
+import { absoluteUrl } from '@/lib/siteUrl'
+import { trimMetaDescription } from '@/lib/seoText'
 
 export function WorkPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -96,21 +101,44 @@ export function WorkPage() {
   const activeHere =
     Boolean(detail && currentTrack && tracks.length > 0 && detail.work.slug === slug)
 
+  const defaultTitle = `${SITE_NAME} · Lovecraft ljudböcker`
+
   if (loading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-40 w-full" />
-        <Skeleton className="h-64 w-full" />
-      </div>
+      <>
+        <Helmet>
+          <title>{defaultTitle}</title>
+          <meta name="description" content={trimMetaDescription(DEFAULT_META_DESCRIPTION)} />
+        </Helmet>
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-64 w-full" />
+        </div>
+      </>
     )
   }
 
   if (err || !detail) {
     return (
-      <p className="text-destructive" role="alert">
-        {err ?? 'Saknas'}
-      </p>
+      <>
+        <Helmet>
+          <title>Verk hittades inte · {SITE_NAME}</title>
+          <meta name="description" content="Verket kunde inte laddas eller finns inte i biblioteket." />
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <div className="space-y-6">
+          <p className="text-destructive" role="alert">
+            {err ?? 'Saknas'}
+          </p>
+          <Button variant="secondary" asChild>
+            <Link to="/">
+              <ArrowLeft className="size-4" />
+              Tillbaka till biblioteket
+            </Link>
+          </Button>
+        </div>
+      </>
     )
   }
 
@@ -230,8 +258,36 @@ export function WorkPage() {
     </section>
   )
 
+  const canonical = absoluteUrl(`/verk/${work.slug}`)
+  const pageTitle = `${work.title_sv} · ${SITE_NAME}`
+  const pageDesc = trimMetaDescription(work.description_sv)
+  const ogImage = work.coverUrl ? absoluteUrl(work.coverUrl) : absoluteUrl('/og-default.png')
+  const audiobookLd = buildAudiobookJsonLd({
+    url: canonical,
+    name: work.title_sv,
+    description: work.description_sv,
+    imageAbsolute: work.coverUrl ? absoluteUrl(work.coverUrl) : null,
+  })
+
   return (
     <div className="space-y-8">
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDesc} />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:type" content="book" />
+        <meta property="og:site_name" content={SITE_NAME} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDesc} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:locale" content="sv_SE" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDesc} />
+        <meta name="twitter:image" content={ogImage} />
+        <script type="application/ld+json">{JSON.stringify(audiobookLd)}</script>
+      </Helmet>
       <Button variant="ghost" size="sm" className="-ml-2" asChild>
         <Link to="/">
           <ArrowLeft className="size-4" />

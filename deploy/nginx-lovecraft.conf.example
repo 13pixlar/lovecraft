@@ -1,5 +1,9 @@
 # Example Nginx site for static SPA + /books media (adjust paths and server_name).
 # After `npm run build`, point root at dist/ and alias books/ to the repo books/ directory.
+#
+# Canonical host: pick one hostname (e.g. www vs apex) and add a separate server block that
+# returns 301 to the canonical URL so search engines do not split ranking across duplicates.
+# Build the app with VITE_SITE_URL set to that same canonical origin.
 
 server {
     listen 443 ssl http2;

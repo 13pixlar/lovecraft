@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
 import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -9,6 +10,8 @@ import { formatTime } from '@/lib/format'
 import { usePlayer } from '@/context/PlayerContext'
 import * as storage from '@/lib/storage'
 import { fetchWork } from '@/lib/api'
+import { SITE_NAME } from '@/lib/siteConstants'
+import { absoluteUrl } from '@/lib/siteUrl'
 
 export function BookmarksPage() {
   const [items, setItems] = useState<BookmarkRow[]>([])
@@ -46,19 +49,37 @@ export function BookmarksPage() {
     playWork(detail.work.slug, detail.work.title_sv, detail.tracks, idx, b.positionSeconds)
   }
 
+  const bmCanonical = absoluteUrl('/bokmarken')
+  const bmTitle = `Bokmärken · ${SITE_NAME}`
+
   if (loading) {
     return (
-      <div className="space-y-4">
-        <Skeleton className="h-10 w-64" />
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-24 w-full" />
-        ))}
-      </div>
+      <>
+        <Helmet>
+          <title>{bmTitle}</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-64" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full" />
+          ))}
+        </div>
+      </>
     )
   }
 
   return (
     <div className="space-y-8">
+      <Helmet>
+        <title>{bmTitle}</title>
+        <meta
+          name="description"
+          content="Dina sparade positioner i Lovecraft-ljudböckerna. Endast i den här webbläsaren."
+        />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href={bmCanonical} />
+      </Helmet>
       <div>
         <h1 className="font-serif text-3xl tracking-tight md:text-4xl">Bokmärken</h1>
         <p className="text-muted-foreground mt-2 max-w-xl text-sm">

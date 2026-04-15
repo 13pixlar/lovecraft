@@ -1,0 +1,18 @@
+{
+  "name": "Arkhamsagor · Lovecraft ljudbok på svenska",
+  "short_name": "Arkhamsagor",
+  "description": "Lovecraft som ljudbok och talbok på svenska. Lyssna i webbläsaren; pausa och återuppta när du vill.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "lang": "sv",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

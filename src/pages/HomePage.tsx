@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
 import { BookOpen, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -12,6 +13,10 @@ import { usePlayer } from '@/context/PlayerContext'
 import type { WorkListItem } from '@/lib/types'
 import { fetchWork } from '@/lib/api'
 import * as storage from '@/lib/storage'
+import { buildWebSiteJsonLd } from '@/lib/jsonLd'
+import { DEFAULT_META_DESCRIPTION, SITE_NAME } from '@/lib/siteConstants'
+import { absoluteUrl } from '@/lib/siteUrl'
+import { trimMetaDescription } from '@/lib/seoText'
 
 export function HomePage() {
   const [works, setWorks] = useState<WorkListItem[]>([])
@@ -62,13 +67,39 @@ export function HomePage() {
     playWork(detail.work.slug, detail.work.title_sv, detail.tracks, 0, 0)
   }
 
+  const siteUrl = absoluteUrl('/')
+  const ogImage = absoluteUrl('/og-default.png')
+  const pageTitle = `${SITE_NAME} · Lovecraft ljudbok & talbok på svenska`
+  const pageDesc = trimMetaDescription(DEFAULT_META_DESCRIPTION)
+  const websiteLd = buildWebSiteJsonLd(siteUrl, DEFAULT_META_DESCRIPTION)
+
   return (
     <div className="space-y-10">
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDesc} />
+        <link rel="canonical" href={siteUrl} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={SITE_NAME} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDesc} />
+        <meta property="og:url" content={siteUrl} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:locale" content="sv_SE" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDesc} />
+        <meta name="twitter:image" content={ogImage} />
+        <script type="application/ld+json">{JSON.stringify(websiteLd)}</script>
+      </Helmet>
       <div className="space-y-2">
+        <p className="text-muted-foreground font-sans text-xs font-medium uppercase tracking-wider">
+          Lovecraft på svenska
+        </p>
         <h1 className="font-serif text-3xl tracking-tight md:text-4xl">Bibliotek</h1>
         <p className="text-muted-foreground max-w-2xl text-sm leading-relaxed">
-          Svenska ljudinspelningar av H.P. Lovecrafts noveller och romaner. Mörkret väntar — men du kan
-          pausa när som helst och återuppta senare.
+          Svenska inspelningar av H.P. Lovecraft — lyssna som ljudbok eller talbok i webbläsaren. Mörkret
+          väntar; du kan pausa när som helst och återuppta senare.
         </p>
       </div>
 
@@ -129,10 +160,19 @@ export function HomePage() {
                       decoding="async"
                     />
                   </Link>
+                  <div className="pointer-events-none absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-background/78 via-background/30 to-transparent px-4 pb-12 pt-5 text-center">
+                    <CardTitle className="font-serif text-[1.3125rem] leading-snug drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)] sm:text-[1.375rem]">
+                      {w.title_sv}
+                    </CardTitle>
+                    {w.original_title_en && (
+                      <p className="text-muted-foreground mt-1.5 line-clamp-2 text-[0.9375rem] italic leading-snug drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]">
+                        {w.original_title_en}
+                      </p>
+                    )}
+                  </div>
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 top-1/2 bg-gradient-to-t from-background/66 via-background/10 to-transparent" />
                   <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-10 flex flex-col rounded-b-xl border-t border-border/28 bg-background/38 px-4 pb-3 pt-4 text-card-foreground shadow-[0_-12px_32px_rgba(0,0,0,0.13)] backdrop-blur-sm">
                     <CardHeader className="p-0 pb-2">
-                      <CardTitle className="sr-only">{w.title_sv}</CardTitle>
                       <CardDescription className="text-foreground/95 line-clamp-3 text-sm leading-snug">
                         {w.description_sv}
                       </CardDescription>
@@ -161,6 +201,9 @@ export function HomePage() {
                 <>
                   <CardHeader>
                     <CardTitle className="font-serif text-xl leading-snug">{w.title_sv}</CardTitle>
+                    {w.original_title_en && (
+                      <p className="text-muted-foreground -mt-1 text-sm italic">{w.original_title_en}</p>
+                    )}
                     <CardDescription className="line-clamp-3">{w.description_sv}</CardDescription>
                     <WorkRatingCardLine stat={ratingStats.get(w.slug)} />
                   </CardHeader>
