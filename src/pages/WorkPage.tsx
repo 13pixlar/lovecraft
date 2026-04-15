@@ -17,6 +17,7 @@ import { usePlayer } from '@/context/PlayerContext'
 import * as api from '@/lib/api'
 import type { TrackRow } from '@/lib/types'
 import { formatTime } from '@/lib/format'
+import * as storage from '@/lib/storage'
 
 export function WorkPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -154,6 +155,7 @@ export function WorkPage() {
           {list.map((t: TrackRow, i: number) => {
             const isCurrent = activeHere && currentTrack?.id === t.id
             const playing = isCurrent && isPlaying
+            const duration = t.duration_seconds ?? storage.getDuration(t.id)
             return (
               <li key={t.id}>
                 <button
@@ -163,9 +165,9 @@ export function WorkPage() {
                 >
                   <div className="min-w-0">
                     <p className="truncate font-medium">{t.title_sv}</p>
-                    {t.duration_seconds != null && (
+                    {duration != null && (
                       <p className="text-muted-foreground text-xs">
-                        {formatTime(t.duration_seconds)}
+                        {formatTime(duration)}
                       </p>
                     )}
                   </div>

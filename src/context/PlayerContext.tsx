@@ -9,8 +9,8 @@ import {
   useState,
 } from 'react'
 import { Howl } from '@/lib/howler'
-import * as api from '@/lib/api'
 import type { TrackRow } from '@/lib/types'
+import * as storage from '@/lib/storage'
 
 type PlayerContextValue = {
   workSlug: string | null
@@ -81,9 +81,20 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const persistPlayback = useCallback((trackId: number | null, pos: number) => {
-    void api.patchPlayback(trackId, pos)
-  }, [])
+  const persistPlayback = useCallback(
+    (track: TrackRow | null, pos: number) => {
+      if (!track || !workSlug) return
+      storage.savePlayback({
+        workSlug,
+        trackId: track.id,
+        positionSeconds: Math.max(0, pos),
+        updatedAt: new Date().toISOString(),
+        trackTitle: track.title_sv ?? null,
+        filename: track.filename ?? null,
+      })
+    },
+    [workSlug],
+  )
 
   const startPositionLoop = useCallback(() => {
     const tick = () => {
@@ -120,11 +131,11 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       howl.once('load', () => {
         const d = howl.duration()
         setDuration(d)
-        void api.patchTrackDuration(tr.id, d)
+        storage.saveDuration(tr.id, d)
         const s = Math.min(Math.max(0, seekTo), Math.max(0, d - 0.25))
         howl.seek(s)
         setPosition(s)
-        persistPlayback(tr.id, s)
+        persistPlayback(tr, s)
         howl.play()
       })
 
@@ -135,9 +146,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         saveTimerRef.current = setInterval(() => {
           const hh = howlRef.current
           if (!hh?.playing()) return
-          const tid = tracksRef.current[index]?.id
-          if (tid == null) return
-          persistPlayback(tid, hh.seek() as number)
+          const t = tracksRef.current[index] ?? null
+          if (!t) return
+          persistPlayback(t, hh.seek() as number)
         }, SAVE_INTERVAL_MS)
       })
 
@@ -151,8 +162,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
           clearInterval(saveTimerRef.current)
           saveTimerRef.current = null
         }
-        const tid = tracksRef.current[index]?.id
-        if (tid != null) persistPlayback(tid, howl.seek() as number)
+        const t = tracksRef.current[index] ?? null
+        if (t) persistPlayback(t, howl.seek() as number)
       })
 
       howl.on('end', () => {
@@ -161,7 +172,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         if (index < list.length - 1) {
           loadHowlAtIndexRef.current(index + 1, 0, list)
         } else {
-          persistPlayback(tr.id, 0)
+          persistPlayback(tr, 0)
         }
       })
     },
@@ -200,19 +211,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const save = () => {
       const h = howlRef.current
       if (!h) return
-      const tid = tracksRef.current[currentIndex]?.id
-      if (tid == null) return
+      const t = tracksRef.current[currentIndex] ?? null
+      if (!t) return
       const pos = h.seek() as number
-      void fetch('/api/playback', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ trackId: tid, positionSeconds: pos }),
-        keepalive: true,
-      })
+      persistPlayback(t, pos)
     }
     window.addEventListener('beforeunload', save)
     return () => window.removeEventListener('beforeunload', save)
-  }, [currentIndex])
+  }, [currentIndex, persistPlayback])
 
   useEffect(() => {
     const h = howlRef.current
@@ -232,8 +238,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       if (!h) return
       h.seek(seconds)
       setPosition(seconds)
-      const id = tracksRef.current[currentIndex]?.id
-      if (id != null) persistPlayback(id, seconds)
+      const t = tracksRef.current[currentIndex] ?? null
+      if (t) persistPlayback(t, seconds)
     },
     [currentIndex, persistPlayback],
   )
@@ -251,12 +257,20 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const addBookmark = useCallback(async (label?: string | null) => {
-    const id = tracksRef.current[currentIndex]?.id
-    if (id == null) return
+    const t = tracksRef.current[currentIndex]
+    if (!t || !workSlug || !workTitle) return
     const h = howlRef.current
     const pos = h ? (h.seek() as number) : position
-    await api.postBookmark(id, pos, label)
-  }, [currentIndex, position])
+    storage.addBookmark({
+      workSlug,
+      workTitle,
+      trackId: t.id,
+      positionSeconds: Math.max(0, pos),
+      label: label?.trim() || null,
+      trackTitle: t.title_sv,
+      filename: t.filename,
+    })
+  }, [currentIndex, position, workSlug, workTitle])
 
   const value = useMemo(
     () =>

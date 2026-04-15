@@ -1,5 +1,5 @@
 export type WorkListItem = {
-  id: number
+  id: string
   slug: string
   title_sv: string
   description_sv: string
@@ -9,22 +9,12 @@ export type WorkListItem = {
   coverUrl: string | null
 }
 
-export type ResumeInfo = {
-  trackId: number
-  workId: number | null
-  positionSeconds: number
-  updatedAt: string
-  trackTitle: string | null
-  filename: string | null
-}
-
 export type WorksResponse = {
   works: WorkListItem[]
-  resume: ResumeInfo | null
 }
 
 export type TrackRow = {
-  id: number
+  id: string
   filename: string
   title_sv: string
   part_index: number
@@ -34,7 +24,7 @@ export type TrackRow = {
 
 export type WorkDetailResponse = {
   work: {
-    id: number
+    id: string
     slug: string
     title_sv: string
     description_sv: string
@@ -46,8 +36,8 @@ export type WorkDetailResponse = {
 }
 
 export type BookmarkRow = {
-  id: number
-  trackId: number
+  id: string
+  trackId: string
   positionSeconds: number
   label: string | null
   createdAt: string

@@ -4,10 +4,11 @@ import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import * as api from '@/lib/api'
 import type { BookmarkRow } from '@/lib/types'
 import { formatTime } from '@/lib/format'
 import { usePlayer } from '@/context/PlayerContext'
+import * as storage from '@/lib/storage'
+import { fetchWork } from '@/lib/api'
 
 export function BookmarksPage() {
   const [items, setItems] = useState<BookmarkRow[]>([])
@@ -17,8 +18,7 @@ export function BookmarksPage() {
 
   async function load() {
     try {
-      const { bookmarks } = await api.fetchBookmarks()
-      setItems(bookmarks)
+      setItems(storage.loadBookmarks() as BookmarkRow[])
     } catch {
       setErr('Kunde inte ladda bokmärken.')
     } finally {
@@ -30,9 +30,9 @@ export function BookmarksPage() {
     void load()
   }, [])
 
-  async function remove(id: number) {
+  async function remove(id: string) {
     try {
-      await api.deleteBookmark(id)
+      storage.deleteBookmark(id)
       setItems((prev) => prev.filter((b) => b.id !== id))
     } catch {
       setErr('Kunde inte ta bort bokmärket.')
@@ -40,7 +40,7 @@ export function BookmarksPage() {
   }
 
   async function goToBookmark(b: BookmarkRow) {
-    const detail = await api.fetchWork(b.workSlug)
+    const detail = await fetchWork(b.workSlug)
     const idx = detail.tracks.findIndex((t) => t.id === b.trackId)
     if (idx < 0) return
     playWork(detail.work.slug, detail.work.title_sv, detail.tracks, idx, b.positionSeconds)

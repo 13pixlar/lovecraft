@@ -9,10 +9,11 @@ import * as api from '@/lib/api'
 import { usePlayer } from '@/context/PlayerContext'
 import type { WorkListItem } from '@/lib/types'
 import { fetchWork } from '@/lib/api'
+import * as storage from '@/lib/storage'
 
 export function HomePage() {
   const [works, setWorks] = useState<WorkListItem[]>([])
-  const [resume, setResume] = useState<Awaited<ReturnType<typeof api.fetchWorks>>['resume']>(null)
+  const [resume, setResume] = useState<storage.PlaybackState | null>(null)
   const [loading, setLoading] = useState(true)
   const [err, setErr] = useState<string | null>(null)
   const { playWork } = usePlayer()
@@ -24,7 +25,7 @@ export function HomePage() {
         const data = await api.fetchWorks()
         if (cancelled) return
         setWorks(data.works)
-        setResume(data.resume)
+        setResume(storage.loadPlayback())
       } catch {
         setErr('Kunde inte ladda biblioteket. Kontrollera att servern kör.')
       } finally {
@@ -37,10 +38,8 @@ export function HomePage() {
   }, [])
 
   async function handleResume() {
-    if (!resume?.trackId || resume.workId == null) return
-    const w = works.find((x) => x.id === resume.workId)
-    if (!w) return
-    const detail = await fetchWork(w.slug)
+    if (!resume?.trackId || !resume.workSlug) return
+    const detail = await fetchWork(resume.workSlug)
     const idx = detail.tracks.findIndex((t) => t.id === resume.trackId)
     if (idx < 0) return
     playWork(
@@ -77,7 +76,7 @@ export function HomePage() {
                 {formatResumeTime(resume.positionSeconds)}
               </CardDescription>
             </div>
-            <Button onClick={handleResume} disabled={works.length === 0}>
+            <Button onClick={handleResume}>
               <Play className="size-4" />
               Återuppta
             </Button>

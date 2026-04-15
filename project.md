@@ -7,7 +7,7 @@ Detta dokument är avsett som ingång för utvecklare/agenter som ska arbeta i r
 ## Arkitektur
 
 - **Monolit i ett repo:** en **Vite + React**-SPA (`src/`) och en **Node**-HTTP-server (`server/`) som körs samtidigt i utveckling.
-- **API + statiska filer:** [Hono](https://hono.dev/) via `@hono/node-server`. SQLite ([better-sqlite3](https://github.com/WiseLibs/better-sqlite3)) för katalog, uppspelningsposition och bokmärken.
+- **API + statiska filer:** [Hono](https://hono.dev/) via `@hono/node-server`. Katalogen läses från `server/catalog.json`. Personliga data (återuppta, bokmärken, spårlängder) sparas i webbläsarens **localStorage**.
 - **Ljud:** webbläsaren hämtar MP3 under `/books/…`; servern stöder **HTTP Range** för seek/streaming. Spelaren bygger på **Howler.js** (npm `howler@2.2.4`).
 
 ```
@@ -22,7 +22,6 @@ Produktion: en process (`npm start`) serverar API + statisk `dist/` + /books
 | `npm run dev` | `concurrently`: API (`tsx watch server/index.ts`, port **3001**) + Vite (**5173**) |
 | `npm run build` | `tsc -b` + `vite build` → `dist/` |
 | `npm start` | `NODE_ENV=production tsx server/index.ts` (API + statisk frontend + böcker) |
-| `npm run db:seed` | Återställer DB från `server/catalog.json` (raderar verk/spår/bokmärken m.m.) |
 | `npm run lint` | ESLint (se nedan) |
 
 **Portar:** API lyssnar på `PORT` eller **3001**. Vid `EADDRINUSE` på 3001: frigör porten eller sätt `PORT=…` och uppdatera proxyn i `vite.config.ts` om du byter standard.
@@ -35,13 +34,10 @@ Produktion: en process (`npm start`) serverar API + statisk `dist/` + /books
 | `src/components/ui/` | shadcn/ui-komponenter (genererade; ESLint ignoreras här) |
 | `src/lib/howler.ts` | CJS-interop för Howler (`Howl`) — importera härifrån, inte `import { Howl } from 'howler'` direkt i komponenter |
 | `server/index.ts` | Hono-app: `/api/*`, `/books/*` (MP3 + PNG-omslag), prod: `serveStatic` + SPA fallback |
-| `server/db.ts` | SQLite-schema och `openDb()` |
-| `server/seed.ts` | Seed från `server/catalog.json` |
 | `server/catalog.json` | Verk, svenska beskrivningar, ordnad lista över MP3-filnamn per verk |
 | `server/covers-map.json` | Slug → filnamn under `books/covers/` (API lägger på `coverUrl`) |
 | `books/*.mp3` | Ljudfiler (refereras i katalogen) |
 | `books/covers/*.png` | Omslag (valfria; mappas via `covers-map.json`) |
-| `data/app.db` | SQLite (skapas vid körning; ska normalt vara i `.gitignore`) |
 | `howler.js/` | Vendorkopia av Howler (referens); **runtime** använder npm-paketet `howler` |
 | `components.json` | shadcn-konfiguration |
 | `vite.config.ts` | `@`-alias → `src/`, proxy `/api` och `/books` → `127.0.0.1:3001`, `optimizeDeps.include: ['howler']` |
@@ -50,27 +46,18 @@ Produktion: en process (`npm start`) serverar API + statisk `dist/` + /books
 
 - **CORS** i dev mot `localhost:5173` / `127.0.0.1:5173`.
 - **Statiska filer under `/books/`:** säker sökväg (ingen `..`). **Content-Type** sätts från filändelse (t.ex. `audio/mpeg`, `image/png`). Range-requests för ljud (och vid behov bilder).
-- **Tom databas:** vid start om `works` är tom körs seed automatiskt (`ensureCatalog` i `server/index.ts`).
+- **Katalog:** servern läser `server/catalog.json` vid start och bygger API-svar i minnet.
 
 Ungefärliga endpoints:
 
-- `GET /api/works` — verk + `track_count`, `coverUrl`, `resume`
+- `GET /api/works` — verk + `track_count`, `coverUrl`
 - `GET /api/works/:slug` — verk + spår med `audioUrl`
-- `GET /api/tracks/:id` — metadata + `audioUrl`
-- `PATCH /api/playback` — `{ trackId, positionSeconds }`
-- `GET /api/bookmarks`, `POST /api/bookmarks`, `DELETE /api/bookmarks/:id`
-- `PATCH /api/tracks/:id/duration` — fyller `duration_seconds` från klienten efter Howler `load`
-
-## Databas
-
-Tabeller: `works`, `tracks`, `playback_state` (singleton `id = 1`), `bookmarks`. Ingen användarautentisering — en global uppspelningsposition.
-
-**Seed** raderar befintliga verk/spår och nollställer uppspelning; kör `npm run db:seed` när `catalog.json` ändrats.
+- (Klientdata) Återuppta/bokmärken/spårlängder sparas lokalt i webbläsaren via `localStorage`.
 
 ## Frontend
 
 - **Router:** `react-router-dom` — `/`, `/verk/:slug`, `/bokmarken` ([`src/App.tsx`](src/App.tsx)).
-- **Spelare:** [`src/context/PlayerContext.tsx`](src/context/PlayerContext.tsx) — `Howl`-instanser, autospar av position (intervall + `beforeunload` med `fetch(..., { keepalive: true })`), automatisk nästa spår i samma verk.
+- **Spelare:** [`src/context/PlayerContext.tsx`](src/context/PlayerContext.tsx) — `Howl`-instanser, autospar av position, bokmärken och spårlängd i `localStorage`, automatisk nästa spår i samma verk.
 - **API-bas:** relativa URL:er `/api/…` och `/books/…` (proxas i dev).
 - **Typer:** [`src/lib/types.ts`](src/lib/types.ts); fetch wrappers i [`src/lib/api.ts`](src/lib/api.ts).
 
@@ -91,6 +78,6 @@ Tabeller: `works`, `tracks`, `playback_state` (singleton `id = 1`), `bookmarks`.
 
 ## Vanliga tillägg för en agent
 
-1. **Nytt verk / nya MP3:** lägg filer i `books/`, uppdatera `server/catalog.json`, kör `npm run db:seed` (eller låt tom DB seedas vid start).
+1. **Nytt verk / nya MP3:** lägg filer i `books/`, uppdatera `server/catalog.json`, starta om dev-servern vid behov.
 2. **Nytt omslag:** fil i `books/covers/`, ny rad i `server/covers-map.json` (slug → exakt filnamn).
 3. **Howler:** utöka [`src/lib/howler.ts`](src/lib/howler.ts) vid behov; behåll `optimizeDeps.include: ['howler']` i Vite.
