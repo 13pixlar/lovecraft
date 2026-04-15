@@ -1,0 +1,133 @@
+{
+  "works": [
+    {
+      "slug": "festivalen",
+      "title_sv": "Festivalen",
+      "original_title_en": "The Festival",
+      "description_sv": "En släkting återvänder till en avlägsen kuststad för julens traditioner och möter en dyster ceremoni där släktens äldsta hemligheter ligger gömda. En kort men intensiv skildring av kosmisk skräck och ritual.",
+      "tracks": ["01 - Festivalen.mp3"]
+    },
+    {
+      "slug": "farg-bortom-tid-och-rum",
+      "title_sv": "Färg bortom tid och rum",
+      "original_title_en": "The Colour Out of Space",
+      "description_sv": "En meteorit slår ner på en nyengelsk gård och sprider en okänd färg som förgiftar mark, djur och människor. En av Lovecrafts mest suggestiva berättelser om det helt främmande som inte kan namnges.",
+      "tracks": ["02 - Färg Borton Tid Och Rum.mp3"]
+    },
+    {
+      "slug": "morkrets-fange",
+      "title_sv": "Mörkrets fånge",
+      "original_title_en": "The Haunter of the Dark",
+      "description_sv": "En författare blir besatt av en övergiven kyrka i Providence och av en uråldrig sten som låser upp något i mörkret. En av Lovecrafts sista noveller, fylld av atmosfär och olycksbådan förebådande.",
+      "tracks": ["02 - Mörkrets Fånge.mp3"]
+    },
+    {
+      "slug": "skuggan-ur-tiden",
+      "title_sv": "Skuggan ur tiden",
+      "original_title_en": "The Shadow Out of Time",
+      "description_sv": "En professor drabbas av minnesluckor och visioner om ett uråldrigt väsen som bytt kropp genom årtusenden. En episk berättelse om Yith, civilisationer och tidens djupaste hemligheter.",
+      "tracks": [
+        "03a - Skuggan Ur Tiden.mp3",
+        "03b - Skuggan Ur Tiden.mp3",
+        "03c - Skuggan Ur Tiden.mp3",
+        "03d - Skuggan Ur Tiden.mp3",
+        "03e - Skuggan Ur Tiden.mp3",
+        "03f - Skuggan Ur Tiden.mp3",
+        "03g - Skuggan Ur Tiden.mp3",
+        "03h - Skuggan Ur Tiden.mp3"
+      ]
+    },
+    {
+      "slug": "cthulhu",
+      "title_sv": "Cthulhu",
+      "original_title_en": "The Call of Cthulhu",
+      "description_sv": "Genom fragmentariska dokument vävs berättelsen om en kult, en storm och ett väsen som vilar i den sjunkna staden R'lyeh. Den novell som gav namn åt Lovecrafts mytologi.",
+      "tracks": ["03 - Cthulhu.mp3"]
+    },
+    {
+      "slug": "varelsen-pa-troskeln",
+      "title_sv": "Varelsen på tröskeln",
+      "original_title_en": "The Thing on the Doorstep",
+      "description_sv": "En vänskap med en ovanlig man leder till kroppsbyte och mörka krafter från det förgångna. En klaustrofobisk berättelse om identitet och vad som kan ligga och vänta utanför dörren.",
+      "tracks": [
+        "04a - Varelsen På Tröskeln.mp3",
+        "04b - Varelsen På Tröskeln.mp3",
+        "04c - Varelsen På Tröskeln.mp3",
+        "04d - Varelsen På Tröskeln.mp3",
+        "04e - Varelsen På Tröskeln.mp3"
+      ]
+    },
+    {
+      "slug": "fasan-i-dunwich",
+      "title_sv": "Fasan i Dunwich",
+      "original_title_en": "The Dunwich Horror",
+      "description_sv": "I den avsides byn Dunwich föds något inom familjen Whateley, och Miskatonic-universitetets bibliotekarier får kämpa mot krafter som hotar hela regionen. En klassisk berättelse om det förbjudna och det som inte ska nämnas.",
+      "tracks": ["04 - Fasan I Dunwich.mp3"]
+    },
+    {
+      "slug": "den-namnlosa-staden",
+      "title_sv": "Den namnlösa staden",
+      "original_title_en": "The Nameless City",
+      "description_sv": "En arkeolog utforskar ruiner i öknen och finner spår av en civilisation som inte borde existera — och en varning inskriven i stenen. En tidig men kärnhård Lovecraft-novell om ödslighet och förbjuden historia.",
+      "tracks": ["05 - Den Namnlösa Staden.mp3"]
+    },
+    {
+      "slug": "viskaren-i-morkret",
+      "title_sv": "Viskaren i mörkret",
+      "original_title_en": "The Whisperer in Darkness",
+      "description_sv": "En folklivsforskare reser till Vermonts avlägsna dalar och möter något som inte följer naturens lagar — och som har planer för mänskligheten. En lång, suggestiv berättelse om Mi-Go och kosmisk hotbild.",
+      "tracks": ["05 - Viskaren I Mörkret.mp3"]
+    },
+    {
+      "slug": "skuggan-over-innsmouth",
+      "title_sv": "Skuggan över Innsmouth",
+      "original_title_en": "The Shadow over Innsmouth",
+      "description_sv": "En resande hamnar i den förfallna hamnstaden Innsmouth och upptäcker att invånarna delar en mörk gemenskap med havets djup. En av Lovecrafts mest lästa romaner, tät av paranoia och uppenbarelse.",
+      "tracks": [
+        "06a - Skuggan Över Innsmouth.mp3",
+        "06b - Skuggan Över Innsmouth.mp3",
+        "06c - Skuggan Över Innsmouth.mp3",
+        "06d - Skuggan Över Innsmouth.mp3",
+        "06e - Skuggan Över Innsmouth.mp3"
+      ]
+    },
+    {
+      "slug": "odjurets-torn",
+      "title_sv": "Odjurets torn",
+      "original_title_en": "The Lurker at the Threshold",
+      "description_sv": "Ambrose Dewart lockas till sitt släkts gamla hem i Massachusetts när han följer spåren av en mörk familjehistoria — och i ett uråldrigt manus finner han en gåtfull varning. Vad som väntar är outsagda sanningar om de stora gamla: väsen som lurar vid gränsen mellan tid och rum och som längtar efter att åter kallas ner till jorden.",
+      "tracks": [
+        "HP Lovecraft Odjurets torn 1.mp3",
+        "HP Lovecraft Odjurets torn 2.mp3",
+        "HP Lovecraft Odjurets torn 3.mp3"
+      ]
+    },
+    {
+      "slug": "vansinnets-berg",
+      "title_sv": "Vansinnets berg",
+      "original_title_en": "At the Mountains of Madness",
+      "description_sv": "Antarktisexpeditionen avslöjar ruiner och en historia som stör vetenskapens grundvalar — och väcker något som borde förbli fruset. En episk roman om uråldrig skräck och det som gömmer sig bortom bergen.",
+      "tracks": [
+        "HP Lovecraft Vansinnets berg 1.mp3",
+        "HP Lovecraft Vansinnets berg 2.mp3",
+        "HP Lovecraft Vansinnets berg 3.mp3",
+        "HP Lovecraft Vansinnets berg 4.mp3",
+        "HP Lovecraft Vansinnets berg 5.mp3",
+        "HP Lovecraft Vansinnets berg 6.mp3",
+        "HP Lovecraft Vansinnets berg 7.mp3",
+        "HP Lovecraft Vansinnets berg 8.mp3",
+        "HP Lovecraft Vansinnets berg 9.mp3",
+        "HP Lovecraft Vansinnets berg 10.mp3",
+        "HP Lovecraft Vansinnets berg 11.mp3",
+        "HP Lovecraft Vansinnets berg 12.mp3"
+      ]
+    },
+    {
+      "slug": "drommarna-i-haxhuset",
+      "title_sv": "Drömmarna i häxhuset",
+      "original_title_en": "The Dreams in the Witch House",
+      "description_sv": "En matematikstudent hyr ett gammalt hus i Arkham och upptäcker att hans rum har en olycksbådande historia kopplad till häxor och hyperdimensionell geometri. En mardrömslik berättelse om tid, rymd och ondska som sipprar igenom väggarna.",
+      "tracks": ["01 - Drömmarna I Häxhuset.mp3"]
+    }
+  ]
+}
