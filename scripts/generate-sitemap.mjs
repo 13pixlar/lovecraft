@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -6,10 +6,50 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, '..')
 const dist = join(root, 'dist')
 
+/**
+ * Vite injects .env* into `vite build`, but this script runs as plain Node — load the same files
+ * so VITE_SITE_URL from .env.production is available (same order / override rules as Vite).
+ */
+function parseEnvFile(filePath) {
+  if (!existsSync(filePath)) return {}
+  const out = {}
+  const text = readFileSync(filePath, 'utf8')
+  for (const line of text.split('\n')) {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) continue
+    const eq = trimmed.indexOf('=')
+    if (eq <= 0) continue
+    const key = trimmed.slice(0, eq).trim()
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) continue
+    let val = trimmed.slice(eq + 1).trim()
+    if (
+      (val.startsWith('"') && val.endsWith('"')) ||
+      (val.startsWith("'") && val.endsWith("'"))
+    ) {
+      val = val.slice(1, -1)
+    }
+    out[key] = val
+  }
+  return out
+}
+
+function loadViteEnvFiles() {
+  const files = ['.env', '.env.local', '.env.production', '.env.production.local']
+  const merged = {}
+  for (const f of files) {
+    Object.assign(merged, parseEnvFile(join(root, f)))
+  }
+  for (const [k, v] of Object.entries(merged)) {
+    if (process.env[k] === undefined && v !== undefined) process.env[k] = v
+  }
+}
+
+loadViteEnvFiles()
+
 const origin = (process.env.VITE_SITE_URL ?? '').trim().replace(/\/$/, '') || 'http://localhost:5173'
 if (!process.env.VITE_SITE_URL?.trim()) {
   console.warn(
-    '[generate-sitemap] VITE_SITE_URL is unset; using http://localhost:5173 for sitemap URLs. Set VITE_SITE_URL for production.',
+    '[generate-sitemap] VITE_SITE_URL is unset; using http://localhost:5173 for sitemap URLs. Set VITE_SITE_URL in .env.production (or the environment) for production.',
   )
 }
 

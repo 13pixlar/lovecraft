@@ -161,11 +161,11 @@ export function HomePage() {
                     />
                   </Link>
                   <div className="pointer-events-none absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-background/78 via-background/30 to-transparent px-4 pb-12 pt-5 text-center">
-                    <CardTitle className="font-serif text-[1.3125rem] leading-snug drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)] sm:text-[1.375rem]">
+                    <CardTitle className="font-serif text-[1.4375rem] leading-snug sm:text-[1.5625rem] [text-shadow:0_1px_3px_rgba(0,0,0,0.88),0_2px_10px_rgba(0,0,0,0.45)]">
                       {w.title_sv}
                     </CardTitle>
                     {w.original_title_en && (
-                      <p className="text-muted-foreground mt-1.5 line-clamp-2 text-[0.9375rem] italic leading-snug drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]">
+                      <p className="text-muted-foreground mt-1.5 line-clamp-2 text-[1rem] italic leading-snug sm:text-[1.0625rem] [text-shadow:0_1px_2px_rgba(0,0,0,0.82),0_2px_8px_rgba(0,0,0,0.42)]">
                         {w.original_title_en}
                       </p>
                     )}
