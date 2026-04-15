@@ -1,5 +1,21 @@
 import { supabase } from '@/lib/supabaseClient'
+import type { Database } from '@/lib/database.types'
 import type { WorkDetailResponse, WorkListItem } from '@/lib/types'
+
+type LovecraftWorkListRow = Pick<
+  Database['public']['Tables']['lovecraft_works']['Row'],
+  'slug' | 'title_sv' | 'description_sv' | 'original_title_en' | 'sort_order' | 'cover_filename'
+>
+
+type LovecraftTrackSlugRow = Pick<
+  Database['public']['Tables']['lovecraft_tracks']['Row'],
+  'work_slug'
+>
+
+type LovecraftTrackDetailRow = Pick<
+  Database['public']['Tables']['lovecraft_tracks']['Row'],
+  'filename' | 'title_sv' | 'sort_order'
+>
 
 function coverUrlFromFilename(coverFilename: string | null): string | null {
   if (!coverFilename) return null
@@ -15,7 +31,8 @@ export async function fetchWorksFromSupabase(): Promise<{ works: WorkListItem[] 
   if (wErr) throw wErr
   if (!works?.length) return { works: [] }
 
-  const slugs = works.map((w) => w.slug)
+  const rows = works as LovecraftWorkListRow[]
+  const slugs = rows.map((w) => w.slug)
   const { data: tracks, error: tErr } = await supabase
     .from('lovecraft_tracks')
     .select('work_slug')
@@ -24,12 +41,12 @@ export async function fetchWorksFromSupabase(): Promise<{ works: WorkListItem[] 
   if (tErr) throw tErr
 
   const countBySlug = new Map<string, number>()
-  for (const row of tracks ?? []) {
+  for (const row of (tracks ?? []) as LovecraftTrackSlugRow[]) {
     const s = row.work_slug
     countBySlug.set(s, (countBySlug.get(s) ?? 0) + 1)
   }
 
-  const list: WorkListItem[] = works.map((w) => ({
+  const list: WorkListItem[] = rows.map((w) => ({
     id: w.slug,
     slug: w.slug,
     title_sv: w.title_sv,
@@ -61,7 +78,7 @@ export async function fetchWorkDetailFromSupabase(slug: string): Promise<WorkDet
 
   if (tErr) throw tErr
 
-  const tracks = (trackRows ?? []).map((t) => ({
+  const tracks = ((trackRows ?? []) as LovecraftTrackDetailRow[]).map((t) => ({
     id: t.filename,
     filename: t.filename,
     title_sv: t.title_sv,
