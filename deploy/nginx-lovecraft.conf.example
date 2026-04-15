@@ -1,0 +1,21 @@
+# Example Nginx site for static SPA + /books media (adjust paths and server_name).
+# After `npm run build`, point root at dist/ and alias books/ to the repo books/ directory.
+
+server {
+    listen 443 ssl http2;
+    server_name example.com;
+
+    root /var/www/lovecraft/dist;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /books/ {
+        alias /var/www/lovecraft/books/;
+        add_header Accept-Ranges bytes;
+        types { }
+        default_type application/octet-stream;
+    }
+}

@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { WorkRatingCardLine } from '@/components/WorkStarRating'
 import * as api from '@/lib/api'
+import { fetchWorkRatingStats, type WorkRatingStat } from '@/lib/api/ratings'
 import { usePlayer } from '@/context/PlayerContext'
 import type { WorkListItem } from '@/lib/types'
 import { fetchWork } from '@/lib/api'
@@ -13,6 +15,7 @@ import * as storage from '@/lib/storage'
 
 export function HomePage() {
   const [works, setWorks] = useState<WorkListItem[]>([])
+  const [ratingStats, setRatingStats] = useState<Map<string, WorkRatingStat>>(new Map())
   const [resume, setResume] = useState<storage.PlaybackState | null>(null)
   const [loading, setLoading] = useState(true)
   const [err, setErr] = useState<string | null>(null)
@@ -22,12 +25,15 @@ export function HomePage() {
     let cancelled = false
     ;(async () => {
       try {
-        const data = await api.fetchWorks()
+        const [data, stats] = await Promise.all([api.fetchWorks(), fetchWorkRatingStats()])
         if (cancelled) return
         setWorks(data.works)
+        setRatingStats(stats)
         setResume(storage.loadPlayback())
       } catch {
-        setErr('Kunde inte ladda biblioteket. Kontrollera att servern kör.')
+        setErr(
+          'Kunde inte ladda biblioteket. Kontrollera VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY och att databasen är seedad.',
+        )
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -130,6 +136,7 @@ export function HomePage() {
                       <CardDescription className="text-foreground/95 line-clamp-3 text-sm leading-snug">
                         {w.description_sv}
                       </CardDescription>
+                      <WorkRatingCardLine stat={ratingStats.get(w.slug)} />
                     </CardHeader>
                     <CardContent className="flex flex-wrap items-center justify-between gap-2 border-t border-border/30 p-0 pt-3">
                       <span className="text-muted-foreground text-xs">
@@ -155,6 +162,7 @@ export function HomePage() {
                   <CardHeader>
                     <CardTitle className="font-serif text-xl leading-snug">{w.title_sv}</CardTitle>
                     <CardDescription className="line-clamp-3">{w.description_sv}</CardDescription>
+                    <WorkRatingCardLine stat={ratingStats.get(w.slug)} />
                   </CardHeader>
                   <CardContent className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-muted-foreground text-xs">

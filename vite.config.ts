@@ -3,21 +3,17 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+import { vitePluginBooks } from './vite-plugin-books'
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), vitePluginBooks(path.resolve(__dirname, 'books'))],
   optimizeDeps: {
     include: ['howler'],
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-    },
-  },
-  server: {
-    proxy: {
-      '/api': { target: 'http://127.0.0.1:3001', changeOrigin: true },
-      '/books': { target: 'http://127.0.0.1:3001', changeOrigin: true },
     },
   },
 })

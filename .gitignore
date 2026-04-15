@@ -4,3 +4,4 @@ dist
 *.local
 books/*.mp3
 howler.js
+syntaxerror/

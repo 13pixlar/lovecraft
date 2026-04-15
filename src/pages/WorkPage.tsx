@@ -13,8 +13,17 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
+import { WorkComments } from '@/components/WorkComments'
+import { WorkTitleRatingStars } from '@/components/WorkStarRating'
 import { usePlayer } from '@/context/PlayerContext'
 import * as api from '@/lib/api'
+import {
+  fetchMyWorkRating,
+  fetchRatingStatForWork,
+  upsertWorkRating,
+  type WorkRatingStat,
+} from '@/lib/api/ratings'
+import { getOrCreateClientId } from '@/lib/clientId'
 import type { TrackRow } from '@/lib/types'
 import { formatTime } from '@/lib/format'
 import * as storage from '@/lib/storage'
@@ -27,6 +36,9 @@ export function WorkPage() {
   const [err, setErr] = useState<string | null>(null)
   const [bmOpen, setBmOpen] = useState(false)
   const [bmLabel, setBmLabel] = useState('')
+  const [ratingStat, setRatingStat] = useState<WorkRatingStat | null>(null)
+  const [myRating, setMyRating] = useState<number | null>(null)
+  const [ratingBusy, setRatingBusy] = useState(false)
 
   useEffect(() => {
     if (!slug) return
@@ -35,6 +47,15 @@ export function WorkPage() {
       try {
         const d = await api.fetchWork(slug)
         if (!cancelled) setDetail(d)
+        const clientId = getOrCreateClientId()
+        const [stat, mine] = await Promise.all([
+          fetchRatingStatForWork(slug),
+          fetchMyWorkRating(slug, clientId),
+        ])
+        if (!cancelled) {
+          setRatingStat(stat)
+          setMyRating(mine)
+        }
       } catch {
         setErr('Verket kunde inte laddas.')
       } finally {
@@ -45,6 +66,22 @@ export function WorkPage() {
       cancelled = true
     }
   }, [slug])
+
+  async function handleRate(n: number) {
+    if (!slug) return
+    setRatingBusy(true)
+    try {
+      const clientId = getOrCreateClientId()
+      await upsertWorkRating(slug, n, clientId)
+      setMyRating(n)
+      const stat = await fetchRatingStatForWork(slug)
+      setRatingStat(stat)
+    } catch {
+      /* tyst fel — kan visa toast senare */
+    } finally {
+      setRatingBusy(false)
+    }
+  }
 
   function startFromBeginning() {
     if (!detail) return
@@ -86,6 +123,12 @@ export function WorkPage() {
         {work.original_title_en && (
           <p className="text-muted-foreground text-sm italic">{work.original_title_en}</p>
         )}
+        <WorkTitleRatingStars
+          stat={ratingStat}
+          myRating={myRating}
+          onRate={(n) => void handleRate(n)}
+          disabled={ratingBusy}
+        />
       </header>
 
       <Card className="border-border/80 bg-card/50">
@@ -220,6 +263,8 @@ export function WorkPage() {
           {tracksSection}
         </div>
       )}
+
+      {slug ? <WorkComments workSlug={slug} /> : null}
     </div>
   )
 }
