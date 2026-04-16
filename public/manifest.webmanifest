@@ -9,9 +9,9 @@
   "lang": "sv",
   "icons": [
     {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/logo.png",
+      "sizes": "400x357",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

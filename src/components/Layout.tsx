@@ -8,13 +8,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <div className="relative flex min-h-svh flex-col pb-44 max-sm:pb-52">
       <header className="border-border/60 bg-background/80 sticky top-0 z-40 overflow-x-clip border-b backdrop-blur-md">
         <div className="mx-auto flex w-full min-w-0 max-w-5xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-          <Link to="/" className="group flex min-w-0 flex-col gap-0.5">
-            <span className="text-foreground font-serif text-xl tracking-tight">
-              Arkham<span className="text-primary">sagor</span>
-            </span>
-            <span className="text-muted-foreground text-xs tracking-wide uppercase">
-              Ljudböcker · H.P. Lovecraft
-            </span>
+          <Link
+            to="/"
+            className="group flex min-w-0 items-center gap-3 sm:gap-4"
+          >
+            <img
+              src="/logo.png"
+              alt=""
+              width={400}
+              height={357}
+              className="h-12 w-auto shrink-0 object-contain opacity-95 transition-opacity group-hover:opacity-100 sm:h-14"
+              aria-hidden
+            />
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="text-foreground font-serif text-xl tracking-tight">
+                Arkham<span className="text-primary">sagor</span>
+              </span>
+              <span className="text-muted-foreground text-xs tracking-wide uppercase">
+                Ljudböcker · H.P. Lovecraft
+              </span>
+            </div>
           </Link>
           <nav className="flex min-w-0 flex-wrap items-center gap-1 sm:shrink-0 sm:justify-end sm:gap-2">
             <Button variant="ghost" size="sm" asChild className="max-sm:px-2">
