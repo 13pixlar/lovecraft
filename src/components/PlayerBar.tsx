@@ -27,6 +27,9 @@ export function PlayerBar() {
   const [bmOpen, setBmOpen] = useState(false)
   const [bmLabel, setBmLabel] = useState('')
   const [bmErr, setBmErr] = useState<string | null>(null)
+  // Tracks the slider thumb position while the user is actively dragging.
+  // null = not dragging; a number = the dragged percentage (0-100).
+  const [dragPct, setDragPct] = useState<number | null>(null)
 
   const {
     workTitle,
@@ -54,6 +57,9 @@ export function PlayerBar() {
   }
 
   const pct = duration > 0 ? (position / duration) * 100 : 0
+  // While dragging: show the dragged position; otherwise show the real playback position.
+  const displayPct = dragPct !== null ? dragPct : pct
+  const displayPosition = dragPct !== null ? (dragPct / 100) * duration : position
 
   return (
     <div className="border-border/80 bg-card/95 fixed inset-x-0 bottom-0 z-50 w-full max-w-full min-w-0 border-t shadow-[0_-12px_40px_rgba(0,0,0,0.35)] backdrop-blur-md">
@@ -182,13 +188,20 @@ export function PlayerBar() {
         </div>
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <span className="text-muted-foreground w-11 shrink-0 text-right text-xs tabular-nums sm:w-12">
-            {formatTime(position)}
+            {formatTime(displayPosition)}
           </span>
           <Slider
-            value={[pct]}
+            value={[displayPct]}
             max={100}
             step={0.1}
             onValueChange={([v]) => {
+              // Update the visual position while dragging without seeking the audio.
+              // This avoids flooding HTML5 audio with rapid currentTime changes on mobile.
+              setDragPct(v)
+            }}
+            onValueCommit={([v]) => {
+              // Seek only once when the user releases the slider (pointerup / touchend).
+              setDragPct(null)
               if (duration <= 0) return
               seek((v / 100) * duration)
             }}

@@ -92,34 +92,36 @@ export function HomePage() {
         <meta name="twitter:image" content={ogImage} />
         <script type="application/ld+json">{JSON.stringify(websiteLd)}</script>
       </Helmet>
-      <div className="space-y-2">
-        <p className="text-muted-foreground font-sans text-xs font-medium uppercase tracking-wider">
-          Lovecraft på svenska
-        </p>
-        <h1 className="font-serif text-3xl tracking-tight md:text-4xl">Bibliotek</h1>
-        <p className="text-muted-foreground max-w-2xl text-sm leading-relaxed">
-          Svenska inspelningar av H.P. Lovecraft — lyssna som ljudbok eller talbok i webbläsaren. Mörkret
-          väntar; du kan pausa när som helst och återuppta senare.
-        </p>
-      </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <div className="space-y-2 sm:w-1/2">
+          <p className="text-muted-foreground font-sans text-xs font-medium uppercase tracking-wider">
+            Lovecraft på svenska
+          </p>
+          <h1 className="font-serif text-3xl tracking-tight md:text-4xl">Bibliotek</h1>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            Svenska inspelningar av H.P. Lovecraft — lyssna som ljudbok eller talbok i webbläsaren. Mörkret
+            väntar; du kan pausa när som helst och återuppta senare.
+          </p>
+        </div>
 
-      {resume && resume.trackId && (
-        <Card className="border-primary/40 bg-primary/5">
-          <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
-            <div>
-              <CardTitle className="text-lg">Fortsätt lyssna</CardTitle>
-              <CardDescription>
-                {resume.trackTitle ?? 'Senaste spår'} ·{' '}
-                {formatResumeTime(resume.positionSeconds)}
-              </CardDescription>
-            </div>
-            <Button onClick={handleResume}>
-              <Play className="size-4" />
-              Återuppta
-            </Button>
-          </CardHeader>
-        </Card>
-      )}
+        {resume && resume.trackId && (
+          <Card className="border-primary/40 bg-primary/5 sm:w-1/2">
+            <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
+              <div>
+                <CardTitle className="text-lg">Fortsätt lyssna</CardTitle>
+                <CardDescription>
+                  {resume.trackTitle ?? 'Senaste spår'} ·{' '}
+                  {formatResumeTime(resume.positionSeconds)}
+                </CardDescription>
+              </div>
+              <Button onClick={handleResume}>
+                <Play className="size-4" />
+                Återuppta
+              </Button>
+            </CardHeader>
+          </Card>
+        )}
+      </div>
 
       {err && (
         <p className="text-destructive text-sm" role="alert">
@@ -146,7 +148,7 @@ export function HomePage() {
               )}
             >
               {w.coverUrl ? (
-                <div className="relative aspect-[10/11] w-full">
+                <div className="relative aspect-[3/4] w-full">
                   <Link
                     to={`/verk/${w.slug}`}
                     className="absolute inset-0 z-0 block overflow-hidden rounded-xl"

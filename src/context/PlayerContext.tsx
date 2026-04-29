@@ -236,8 +236,19 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     (seconds: number) => {
       const h = howlRef.current
       if (!h) return
+      const wasPlaying = h.playing()
       h.seek(seconds)
       setPosition(seconds)
+      // HTML5 audio on mobile (iOS/Android) can silently stop when currentTime
+      // is changed while playing. After a short delay we check and resume.
+      if (wasPlaying) {
+        setTimeout(() => {
+          const cur = howlRef.current
+          if (cur && !cur.playing()) {
+            cur.play()
+          }
+        }, 200)
+      }
       const t = tracksRef.current[currentIndex] ?? null
       if (t) persistPlayback(t, seconds)
     },
